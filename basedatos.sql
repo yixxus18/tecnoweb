@@ -52,10 +52,19 @@ CREATE TABLE accesorios (
   id_inventario INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
   nombre VARCHAR(50) NOT NULL,
   descripcion VARCHAR(100),
+  precio decimal (8,2),
+  cantidad int,
   tipo_cat INT,
   FOREIGN KEY (tipo_cat) REFERENCES categorias (id_cat)
 );
 /* agregar cantidad de accesorios y otra tabla de accesorios vendidos*/
+create table registro_accesorios (
+	id_acc int auto_increment primary key not null,
+    accesorio int,
+    fecha date,
+    cantidad_vendida int,
+    foreign key (accesorio) references accesorios(id_inventario)
+);
 
 -- Crear la tabla 'dispositivos_usuarios'
 CREATE TABLE dispositivos_usuarios (
@@ -98,44 +107,81 @@ ALTER TABLE accesorios AUTO_INCREMENT = 1000;
 ALTER TABLE dispositivos_usuarios AUTO_INCREMENT = 1000;
 ALTER TABLE citas AUTO_INCREMENT = 1000;
 ALTER TABLE reporte AUTO_INCREMENT = 1000;
+ALTER TABLE registro_accesorios AUTO_INCREMENT = 1000;
 
--- Insertar registros en la tabla 'usuarios'
--- Insertar registros en la tabla 'usuarios'
+DELIMITER //
+CREATE TRIGGER actualizar_cantidad_accesorios
+AFTER INSERT ON registro_accesorios
+FOR EACH ROW
+BEGIN
+    DECLARE cantidad_actual INT;
+    
+    -- Obtener la cantidad actual de accesorios
+    SELECT cantidad INTO cantidad_actual FROM accesorios WHERE id_inventario = NEW.accesorio;
+    
+    -- Restar la cantidad vendida a la cantidad actual
+    SET cantidad_actual = cantidad_actual - NEW.cantidad_vendida;
+    
+    -- Actualizar la cantidad en la tabla accesorios
+    UPDATE accesorios SET cantidad = cantidad_actual WHERE id_inventario = NEW.accesorio;
+END //
+DELIMITER ;
+DELIMITER //
+CREATE TRIGGER restar_cantidad_accesorios
+AFTER UPDATE ON registro_accesorios
+FOR EACH ROW
+BEGIN
+    DECLARE cantidad_actual INT;
+    
+    -- Obtener la cantidad actual de accesorios
+    SELECT cantidad INTO cantidad_actual FROM accesorios WHERE id_inventario = NEW.accesorio;
+    
+    -- Restar la cantidad vendida actualizada a la cantidad actual
+    SET cantidad_actual = cantidad_actual - (NEW.cantidad_vendida - OLD.cantidad_vendida);
+    
+    -- Actualizar la cantidad en la tabla accesorios
+    UPDATE accesorios SET cantidad = cantidad_actual WHERE id_inventario = NEW.accesorio;
+END //
+DELIMITER ;
+
+-- Agregar 5 registros a la tabla 'usuarios'
+use tecnoweb2;
 INSERT INTO usuarios (nombre, apellidos, edad, genero, telefono, correo, contraseña)
 VALUES
-  ('Juan', 'Perez', 25, 'M', '1234567890', 'juan@example.com', 'contraseña1'),
-  ('María', 'Lopez', 30, 'F', '9876543210', 'maria@example.com', 'contraseña2'),
-  ('Carlos', 'García', 35, 'M', '4567890123', 'carlos@example.com', 'contraseña3'),
-  ('Laura', 'Rodriguez', 28, 'F', '7890123456', 'laura@example.com', 'contraseña4'),
-  ('Pedro', 'González', 32, 'M', '3216549870', 'pedro@example.com', 'contraseña5');
+  ('Elena', 'González', 27, 'F', '4561237890', 'elena@example.com', 'contraseña6'),
+  ('Andrés', 'Martínez', 40, 'M', '9870123456', 'andres@example.com', 'contraseña7'),
+  ('Sofía', 'López', 22, 'F', '6549873210', 'sofia@example.com', 'contraseña8'),
+  ('Alejandro', 'Hernández', 33, 'M', '3217896540', 'alejandro@example.com', 'contraseña9'),
+  ('Ana', 'Ramírez', 29, 'F', '8904561237', 'ana@example.com', 'contraseña10');
 
--- Insertar registros en la tabla 'dispositivos'
+-- Agregar 5 registros a la tabla 'dispositivos'
 INSERT INTO dispositivos (marca, modelo, tipo_dispositivos)
 VALUES
-  ('Samsung', 'Galaxy S20', 'celulares'),
-  ('Apple', 'iPad Pro', 'tablets'),
-  ('Dell', 'XPS 15', 'laptops'),
-  ('HP', 'Pavilion', 'laptops'),
-  ('Sony', 'PlayStation 5', 'consolas');
+  ('Motorola', 'Moto G8', 'celulares'),
+  ('Lenovo', 'Tab M10', 'tablets'),
+  ('Asus', 'ROG Strix G15', 'laptops'),
+  ('Acer', 'Nitro 5', 'laptops'),
+  ('Microsoft', 'Xbox Series X', 'consolas');
 
--- Insertar registros en la tabla 'reparaciones'
+-- Agregar 5 registros a la tabla 'reparaciones'
 INSERT INTO reparaciones (tipo_reparaciones, descripcion)
 VALUES
-  ('Reparación de pantalla', 'Reemplazo de la pantalla dañada'),
-  ('Cambio de batería', 'Sustitución de la batería agotada'),
-  ('Reinstalación del sistema operativo', 'Formateo y reinstalación del sistema operativo'),
-  ('Reparación o reemplazo del teclado', 'Arreglo o sustitución del teclado defectuoso'),
-  ('Limpieza y mantenimiento', 'Limpieza del sistema de ventilación');
+  ('Reemplazo de batería', 'Cambio de la batería dañada'),
+  ('Reparación de software', 'Solución de problemas de software'),
+  ('Reparación de conector de carga', 'Arreglo del conector de carga defectuoso'),
+  ('Reparación de placa madre', 'Reparación o reemplazo de la placa madre'),
+  ('Actualización de memoria RAM', 'Aumento de la memoria RAM');
 
--- Insertar registros en la tabla 'reparacion_dispositivos'
+-- Agregar 5 registros a la tabla 'reparacion_dispositivos'
 INSERT INTO reparacion_dispositivos (dispositivo_id, reparacion_id)
 VALUES
+  (1000, 1000),
   (1001, 1001),
-  (1002, 1002),
-  (1003, 1003),
+  (1002, 1003),
+  (1003, 1002),
   (1004, 1004);
 
--- Insertar registros en la tabla 'categorias'
+-- Agregar 5 registros a la tabla 'categorias'
 INSERT INTO categorias (tipo)
 VALUES
   ('fundas'),
@@ -144,44 +190,69 @@ VALUES
   ('memorias'),
   ('cables'),
   ('audifonos');
-
--- Insertar registros en la tabla 'accesorios'
-INSERT INTO accesorios (nombre, descripcion, tipo_cat)
+-- Agregar 5 registros a la tabla 'accesorios'
+INSERT INTO accesorios (nombre, descripcion, precio, cantidad, tipo_cat)
 VALUES
-  ('Funda transparente', 'Funda de plástico transparente para protección', 1001),
-  ('Mica de vidrio templado', 'Mica protectora de pantalla de vidrio templado', 1002),
-  ('Cargador rápido', 'Cargador rápido de 20W para dispositivos móviles', 1003),
-  ('Tarjeta de memoria microSD', 'Tarjeta de memoria microSD de 64GB', 1004),
-  ('Cable USB tipo C', 'Cable USB tipo C de 2 metros de longitud', 1005);
+  ('Adaptador USB-C a HDMI', 'Adaptador para conectar dispositivos USB-C a HDMI', 49.99, 15, 1000),
+  ('Altavoz Bluetooth', 'Altavoz portátil con conectividad Bluetooth', 69.99, 20, 1001),
+  ('Base de refrigeración', 'Base para laptops con ventiladores para mantener la temperatura baja', 29.99, 8, 1002),
+  ('Mouse inalámbrico', 'Mouse ergonómico con conexión inalámbrica', 19.99, 12, 1003),
+  ('Teclado retroiluminado', 'Teclado con retroiluminación LED ajustable', 39.99, 10, 1004);
 
--- Insertar registros en la tabla 'dispositivos_usuarios'
+-- Agregar 5 registros a la tabla 'dispositivos_usuarios'
 INSERT INTO dispositivos_usuarios (rep_dis, usuario)
 VALUES
   (1000, 1000),
   (1001, 1001),
-  (1002, 1002),
-  (1003, 1003);
+  (1003, 1002),
+  (1002, 1003),
+  (1004, 1004);
 
--- Insertar registros en la tabla 'citas'
+-- Agregar 5 registros a la tabla 'citas'
 INSERT INTO citas (fecha_cita, motivo_cita, usuario_reg, dis_id, rep_id)
 VALUES
-  ('2023-06-01', 'Reparación de pantalla rota', 1000, 1000, 1000),
-  ('2023-06-02', 'Cambio de batería agotada', 1001, 1001, 1001),
-  ('2023-06-03', 'Reinstalación del sistema operativo', 1002, 1002, 1002),
-  ('2023-06-04', 'Reparación del teclado defectuoso', 1003, 1003, 1003),
-  ('2023-06-05', 'Limpieza y mantenimiento', 1004, 1004, 1004);
+  ('2023-06-06', 'Reparación de software', 1000, 1000, 1001),
+  ('2023-06-07', 'Reemplazo de batería', 1001, 1001, 1002),
+  ('2023-06-08', 'Reparación de conector de carga', 1002, 1002, 1003),
+  ('2023-06-09', 'Reparación de placa madre', 1003, 1003, 1004),
+  ('2023-06-10', 'Actualización de memoria RAM', 1004, 1004, 1000);
 
--- Insertar registros en la tabla 'reporte'
+-- Agregar 5 registros a la tabla 'reporte'
 INSERT INTO reporte (precio, fecha_entrega, cita)
 VALUES
-  (50.00, '2023-06-07', 1000),
-  (80.00, '2023-06-08', 1001),
-  (120.00, '2023-06-09', 1002),
-  (90.00, '2023-06-10', 1003),
-  (60.00, '2023-06-11', 1004);
-  
+  (60.00, '2023-06-13', 1000),
+  (70.00, '2023-06-14', 1001),
+  (90.00, '2023-06-15', 1002),
+  (80.00, '2023-06-16', 1003),
+  (75.00, '2023-06-17', 1004);
+
+-- Agregar 5 registros a la tabla 'registro_accesorios'
+INSERT INTO registro_accesorios (accesorio, fecha,cantidad_vendida)
+VALUES
+  (1000, '2023-06-06','2'),
+  (1001, '2023-06-07','3'),
+  (1002, '2023-06-08','1'),
+  (1003, '2023-06-09','5'),
+  (1004, '2023-06-10','1');
+
   /*citas creadas el mes de junio*/
   SELECT id_cita,nombre
 FROM citas
 inner join usuarios on usuarios.registro = citas.usuario_reg
 WHERE MONTH(fecha_cita) = 6;
+
+SELECT 
+    r.accesorio,
+    SUM(r.cantidad_vendida) AS cantidad_vendida,
+    SUM(a.precio * r.cantidad_vendida) AS total
+FROM
+    registro_accesorios r
+    JOIN accesorios a ON r.accesorio = a.id_inventario
+WHERE
+    MONTH(r.fecha) = 6
+GROUP BY
+    r.accesorio;
+
+UPDATE registro_accesorios
+SET cantidad_vendida = cantidad_vendida + 2
+WHERE id_acc = 1000;
