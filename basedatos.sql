@@ -55,6 +55,7 @@ CREATE TABLE accesorios (
   tipo_cat INT,
   FOREIGN KEY (tipo_cat) REFERENCES categorias (id_cat)
 );
+/* agregar cantidad de accesorios y otra tabla de accesorios vendidos*/
 
 -- Crear la tabla 'dispositivos_usuarios'
 CREATE TABLE dispositivos_usuarios (
@@ -178,4 +179,9 @@ VALUES
   (120.00, '2023-06-09', 1002),
   (90.00, '2023-06-10', 1003),
   (60.00, '2023-06-11', 1004);
-
+  
+  /*citas creadas el mes de junio*/
+  SELECT id_cita,nombre
+FROM citas
+inner join usuarios on usuarios.registro = citas.usuario_reg
+WHERE MONTH(fecha_cita) = 6;
