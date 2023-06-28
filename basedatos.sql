@@ -19,7 +19,7 @@ CREATE TABLE usuarios (
 
 -- Crear la tabla 'dispositivos'
 CREATE TABLE dispositivos (
-  id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+  id_dips INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
   marca VARCHAR(50) NOT NULL,
   modelo VARCHAR(50) NOT NULL,
   tipo_dispositivos ENUM ('celulares', 'tablets', 'laptops', 'computadoras', 'consolas')
@@ -37,7 +37,7 @@ CREATE TABLE reparacion_dispositivos (
   id_rd INT AUTO_INCREMENT PRIMARY KEY,
   dispositivo_id INT NOT NULL,
   reparacion_id INT NOT NULL,
-  FOREIGN KEY (dispositivo_id) REFERENCES dispositivos (id),
+  FOREIGN KEY (dispositivo_id) REFERENCES dispositivos (id_dips),
   FOREIGN KEY (reparacion_id) REFERENCES reparaciones (id_reparaciones)
 );
 
@@ -73,7 +73,7 @@ CREATE TABLE citas (
   usuario_reg INT,
   dis_id INT,
   rep_id INT,
-  FOREIGN KEY (dis_id) REFERENCES dispositivos (id),
+  FOREIGN KEY (dis_id) REFERENCES dispositivos (id_dips),
   FOREIGN KEY (usuario_reg) REFERENCES usuarios (registro),
   FOREIGN KEY (rep_id) REFERENCES reparaciones (id_reparaciones)
 );
@@ -99,6 +99,7 @@ ALTER TABLE citas AUTO_INCREMENT = 1000;
 ALTER TABLE reporte AUTO_INCREMENT = 1000;
 
 -- Insertar registros en la tabla 'usuarios'
+-- Insertar registros en la tabla 'usuarios'
 INSERT INTO usuarios (nombre, apellidos, edad, genero, telefono, correo, contraseña)
 VALUES
   ('Juan', 'Perez', 25, 'M', '1234567890', 'juan@example.com', 'contraseña1'),
@@ -123,7 +124,7 @@ VALUES
   ('Cambio de batería', 'Sustitución de la batería agotada'),
   ('Reinstalación del sistema operativo', 'Formateo y reinstalación del sistema operativo'),
   ('Reparación o reemplazo del teclado', 'Arreglo o sustitución del teclado defectuoso'),
-  ('Limpieza y mantenimiento del sistema de refrigeración', 'Limpieza del sistema de ventilación y disipadores de calor');
+  ('Limpieza y mantenimiento', 'Limpieza del sistema de ventilación');
 
 -- Insertar registros en la tabla 'reparacion_dispositivos'
 INSERT INTO reparacion_dispositivos (dispositivo_id, reparacion_id)
@@ -131,8 +132,7 @@ VALUES
   (1001, 1001),
   (1002, 1002),
   (1003, 1003),
-  (1004, 1004),
-  (1005, 1005);
+  (1004, 1004);
 
 -- Insertar registros en la tabla 'categorias'
 INSERT INTO categorias (tipo)
@@ -149,28 +149,26 @@ INSERT INTO accesorios (nombre, descripcion, tipo_cat)
 VALUES
   ('Funda transparente', 'Funda de plástico transparente para protección', 1001),
   ('Mica de vidrio templado', 'Mica protectora de pantalla de vidrio templado', 1002),
-  ('Cargador USB', 'Cargador USB de 2 puertos', 1003),
+  ('Cargador rápido', 'Cargador rápido de 20W para dispositivos móviles', 1003),
   ('Tarjeta de memoria microSD', 'Tarjeta de memoria microSD de 64GB', 1004),
-  ('Cable USB tipo C', 'Cable USB tipo C de 1 metro de longitud', 1005),
-  ('Audífonos inalámbricos', 'Audífonos inalámbricos con cancelación de ruido', 1006);
+  ('Cable USB tipo C', 'Cable USB tipo C de 2 metros de longitud', 1005);
 
 -- Insertar registros en la tabla 'dispositivos_usuarios'
 INSERT INTO dispositivos_usuarios (rep_dis, usuario)
 VALUES
-  (1001, 1000),
-  (1002, 1001),
-  (1003, 1002),
-  (1004, 1003),
-  (1005, 1004);
+  (1000, 1000),
+  (1001, 1001),
+  (1002, 1002),
+  (1003, 1003);
 
 -- Insertar registros en la tabla 'citas'
 INSERT INTO citas (fecha_cita, motivo_cita, usuario_reg, dis_id, rep_id)
 VALUES
-  ('2023-06-01', 'Reparación de pantalla rota', 1000, 1001, 1001),
-  ('2023-06-02', 'Cambio de batería agotada', 1001, 1002, 1002),
-  ('2023-06-03', 'Reinstalación del sistema operativo', 1002, 1003, 1003),
-  ('2023-06-04', 'Reparación del teclado defectuoso', 1003, 1004, 1004),
-  ('2023-06-05', 'Limpieza y mantenimiento del sistema de refrigeración', 1004, 1005, 1005);
+  ('2023-06-01', 'Reparación de pantalla rota', 1000, 1000, 1000),
+  ('2023-06-02', 'Cambio de batería agotada', 1001, 1001, 1001),
+  ('2023-06-03', 'Reinstalación del sistema operativo', 1002, 1002, 1002),
+  ('2023-06-04', 'Reparación del teclado defectuoso', 1003, 1003, 1003),
+  ('2023-06-05', 'Limpieza y mantenimiento', 1004, 1004, 1004);
 
 -- Insertar registros en la tabla 'reporte'
 INSERT INTO reporte (precio, fecha_entrega, cita)
@@ -180,3 +178,4 @@ VALUES
   (120.00, '2023-06-09', 1002),
   (90.00, '2023-06-10', 1003),
   (60.00, '2023-06-11', 1004);
+
