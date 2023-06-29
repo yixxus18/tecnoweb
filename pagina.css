@@ -1,0 +1,149 @@
+body {
+    margin: 0;
+    padding: 0;
+  }
+  
+  #banner {
+    background-image: url('../img/banner.jpg');
+  background-size: cover;
+  background-position: center;
+  padding: 20px;
+  text-align: center;
+  }
+  
+  #banner h1 {
+    margin: 0;
+  font-family: 'Roboto', sans-serif;
+  font-size: 48px;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 4px rgb(30, 255, 0);
+  }
+  
+  #banner2 {
+    background-color: #000;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  #banner2 nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  #banner2 nav ul li {
+    display: inline;
+  margin: 0 50px;
+  }
+  
+  #banner2 nav ul li a {
+    display: inline-block;
+    font-family: 'Roboto', sans-serif;
+    font-size: 30px; 
+    color: #00FF00;
+    text-decoration: none;
+    padding: 10px;
+  }
+  
+  #banner2 nav ul li a:hover {
+    background-color: #00FF00;
+    color: #000;
+  }
+ 
+  .search-box {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    vertical-align: middle;
+  }
+  
+  .search-box input[type="text"] {
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 180px;
+  }
+  
+  .search-box button {
+    padding: 20px 20px;
+  border: none;
+  background-color: transparent; 
+  background-image: url("../img/search-bar-flat-icon-free-png.png");
+  background-repeat: no-repeat;
+  background-size: cover; 
+  color: transparent; 
+  font-size: 0; 
+  border-radius: 1%;
+  cursor: pointer;
+  }
+  .and{
+    display: flex;
+    background-color: #62f28b;
+  width: 100%; /* Ancho del div */
+  height: 805px; 
+  }
+
+  .duv{
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .dex{
+    flex: 1;
+    padding-left: 750px;
+    padding: 50px;
+    font-size: 27px;
+  }
+  .button{
+    background-color: #00FF00;
+    width: 400px;
+    height: 40px;
+    font-size: 27px;
+  }
+
+  .hfour{
+    padding-left: 323px;
+  }
+
+  .inpods{
+    width: 400px;
+    height: 30px;
+    
+
+  }
+
+  .mini-buttons {
+    display: flex;
+    padding-left: 300px;
+  }
+  
+  .mini-buttons a {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    margin-right: 10px;
+    border: 1px solid #ffffff;
+    text-decoration: none;
+    color: #000000;
+  }
+  
+  .mini-buttons a img {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+  }
+
+  .claaaa{
+    padding-left: 198px;
+  }
+
+
+  .dr
+  {
+    padding-left: 220px;
+  }
