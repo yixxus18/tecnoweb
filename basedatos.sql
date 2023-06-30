@@ -58,13 +58,7 @@ CREATE TABLE accesorios (
   FOREIGN KEY (tipo_cat) REFERENCES categorias (id_cat)
 );
 /* agregar cantidad de accesorios y otra tabla de accesorios vendidos*/
-create table registro_accesorios (
-	id_acc int auto_increment primary key not null,
-    accesorio int,
-    fecha date,
-    cantidad_vendida int,
-    foreign key (accesorio) references accesorios(id_inventario)
-);
+
 
 -- Crear la tabla 'dispositivos_usuarios'
 CREATE TABLE dispositivos_usuarios (
@@ -97,6 +91,29 @@ CREATE TABLE reporte (
   FOREIGN KEY (cita) REFERENCES citas (id_cita)
 );
 
+-- Crear la tabla 'registro_accesorios'
+CREATE TABLE registro_accesorios (
+  id_reg INT AUTO_INCREMENT PRIMARY KEY,
+  fecha_venta DATE,
+  cantidad_v INT,
+  accesorio_id INT,
+  FOREIGN KEY (accesorio_id) REFERENCES accesorios (id_inventario)
+);
+
+-- Crear el disparador para actualizar la cantidad en la tabla 'accesorios' cuando se inserta un registro en 'registro_accesorios'
+DELIMITER //
+
+CREATE TRIGGER actualizar_cantidad_accesorios
+AFTER INSERT ON registro_accesorios
+FOR EACH ROW
+BEGIN
+  UPDATE accesorios
+  SET cantidad = cantidad - NEW.cantidad_v
+  WHERE id_inventario = NEW.accesorio_id;
+END//
+
+DELIMITER ;
+
 -- Establecer el valor de incremento automático en cada tabla
 ALTER TABLE usuarios AUTO_INCREMENT = 1000;
 ALTER TABLE dispositivos AUTO_INCREMENT = 1000;
@@ -108,41 +125,6 @@ ALTER TABLE dispositivos_usuarios AUTO_INCREMENT = 1000;
 ALTER TABLE citas AUTO_INCREMENT = 1000;
 ALTER TABLE reporte AUTO_INCREMENT = 1000;
 ALTER TABLE registro_accesorios AUTO_INCREMENT = 1000;
-
-DELIMITER //
-CREATE TRIGGER actualizar_cantidad_accesorios
-AFTER INSERT ON registro_accesorios
-FOR EACH ROW
-BEGIN
-    DECLARE cantidad_actual INT;
-    
-    -- Obtener la cantidad actual de accesorios
-    SELECT cantidad INTO cantidad_actual FROM accesorios WHERE id_inventario = NEW.accesorio;
-    
-    -- Restar la cantidad vendida a la cantidad actual
-    SET cantidad_actual = cantidad_actual - NEW.cantidad_vendida;
-    
-    -- Actualizar la cantidad en la tabla accesorios
-    UPDATE accesorios SET cantidad = cantidad_actual WHERE id_inventario = NEW.accesorio;
-END //
-DELIMITER ;
-DELIMITER //
-CREATE TRIGGER restar_cantidad_accesorios
-AFTER UPDATE ON registro_accesorios
-FOR EACH ROW
-BEGIN
-    DECLARE cantidad_actual INT;
-    
-    -- Obtener la cantidad actual de accesorios
-    SELECT cantidad INTO cantidad_actual FROM accesorios WHERE id_inventario = NEW.accesorio;
-    
-    -- Restar la cantidad vendida actualizada a la cantidad actual
-    SET cantidad_actual = cantidad_actual - (NEW.cantidad_vendida - OLD.cantidad_vendida);
-    
-    -- Actualizar la cantidad en la tabla accesorios
-    UPDATE accesorios SET cantidad = cantidad_actual WHERE id_inventario = NEW.accesorio;
-END //
-DELIMITER ;
 
 -- Agregar 5 registros a la tabla 'usuarios'
 use tecnoweb2;
@@ -226,33 +208,5 @@ VALUES
   (80.00, '2023-06-16', 1003),
   (75.00, '2023-06-17', 1004);
 
--- Agregar 5 registros a la tabla 'registro_accesorios'
-INSERT INTO registro_accesorios (accesorio, fecha,cantidad_vendida)
-VALUES
-  (1000, '2023-06-06','2'),
-  (1001, '2023-06-07','3'),
-  (1002, '2023-06-08','1'),
-  (1003, '2023-06-09','5'),
-  (1004, '2023-06-10','1');
-
-  /*citas creadas el mes de junio*/
-  SELECT id_cita,nombre
-FROM citas
-inner join usuarios on usuarios.registro = citas.usuario_reg
-WHERE MONTH(fecha_cita) = 6;
-
-SELECT 
-    r.accesorio,
-    SUM(r.cantidad_vendida) AS cantidad_vendida,
-    SUM(a.precio * r.cantidad_vendida) AS total
-FROM
-    registro_accesorios r
-    JOIN accesorios a ON r.accesorio = a.id_inventario
-WHERE
-    MONTH(r.fecha) = 6
-GROUP BY
-    r.accesorio;
-
-UPDATE registro_accesorios
-SET cantidad_vendida = cantidad_vendida + 2
-WHERE id_acc = 1000;
+INSERT INTO registro_accesorios (fecha_venta, cantidad_v, accesorio_id)
+VALUES ('2023-06-20', 3, 1000);
