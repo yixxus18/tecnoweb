@@ -44,7 +44,7 @@ CREATE TABLE reparacion_dispositivos (
 -- Crear la tabla 'categorias'
 CREATE TABLE categorias (
  id_cat INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
- tipo ENUM ('fundas', 'micas', 'cargadores', 'memorias', 'cables', 'audifonos')
+ tipo ENUM ('fundas', 'micas', 'cargadores', 'memorias', 'cables', 'audifonos','celulares')
 );
 
 -- Crear la tabla 'accesorios'
@@ -210,3 +210,57 @@ VALUES
 
 INSERT INTO registro_accesorios (fecha_venta, cantidad_v, accesorio_id)
 VALUES ('2023-06-20', 3, 1000);
+
+use tecnoweb2;
+DELIMITER //
+
+CREATE TRIGGER validar_correo
+BEFORE INSERT ON usuarios
+FOR EACH ROW
+BEGIN
+  IF NEW.correo NOT LIKE '%@%' THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El correo debe contener el símbolo "@"';
+  END IF;
+END//
+DELIMITER ;
+
+
+CREATE VIEW reporte_ventas_accesorios AS
+SELECT a.nombre AS nombre_accesorio, SUM(ra.cantidad_v) AS cantidad_vendida, SUM(a.precio * ra.cantidad_v) AS monto_total
+FROM accesorios a
+INNER JOIN registro_accesorios ra ON a.id_inventario = ra.accesorio_id
+GROUP BY a.nombre;
+
+
+-- Crear la vista para el reporte mensual de reparaciones
+CREATE VIEW reporte_reparaciones_mensuales AS
+SELECT
+  MONTH(fecha_entrega) AS mes,
+  YEAR(fecha_entrega) AS anio,
+  COUNT(*) AS cantidad_reparaciones
+FROM
+  reporte
+GROUP BY
+  MONTH(fecha_entrega), YEAR(fecha_entrega);
+
+
+-- Crear la vista para el reporte detallado de reparaciones
+CREATE VIEW reporte_reparaciones_detalle AS
+SELECT
+  r.id_reporte,
+  r.fecha_entrega,
+  c.fecha_cita,
+  u.nombre,
+  u.apellidos,
+  d.marca,
+  d.modelo,
+  rep.tipo_reparaciones,
+  r.precio AS costo_reparacion
+FROM
+  reporte r
+  JOIN citas c ON r.cita = c.id_cita
+  JOIN usuarios u ON c.usuario_reg = u.registro
+  JOIN dispositivos d ON c.dis_id = d.id_dips
+  JOIN reparaciones rep ON c.rep_id = rep.id_reparaciones;
+
+  
