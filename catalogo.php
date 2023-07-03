@@ -1,0 +1,20 @@
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$database = "tecnoweb2";
+
+try {
+    $conn = new PDO("mysql:host=$servername;dbname=$database", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $stmt = $conn->prepare("SELECT tipo FROM categorias");
+    $stmt->execute();
+    $categorias = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+} catch (PDOException $e) {
+    echo "Error de conexión: " . $e->getMessage();
+}
+
+$conn = null;
+?>
