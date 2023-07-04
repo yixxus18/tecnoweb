@@ -18,3 +18,15 @@ try {
 
 $conn = null;
 ?>
+
+<form action="catalogo.php" method="post">
+    <label for="categoria">Categoria:</label>
+    <select name="categorias" id="categoria" style="width: 100px;">
+        <?php foreach ($categorias as $categoria): ?>
+            <option value="<?php echo $categoria; ?>"><?php echo $categoria; ?></option>
+        <?php endforeach; ?>
+    </select>
+    <br>
+    <br>
+    <input type="submit" value="Enviar">
+</form>
